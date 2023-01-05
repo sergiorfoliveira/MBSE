@@ -1,0 +1,24 @@
+function [result] = ahpGaussiano2(valores_atributos, crescimento, pesos)
+%  "crescimento" deve ter o mesno número de elementos que as colunas de "atributos"
+%  "crescimento" True : quanto maior o atributo, melhor
+%  "crescimento" False : quanto maior o atributo, pior
+%  Exemplo de uso: result=ahpGaussiano2([MAU(:,1), Total_Cost(:,1)], [true, false], [1,1])
+
+    [L, S] = size(valores_atributos);
+    totais(1:S) = 0;
+    df(1:L,1:S) = 0.0;
+    for s = 1:S
+        valores_atributos(:,s) = valores_atributos(:,s)*pesos(s);
+        totais(s) = sum(valores_atributos(:,s));
+    end
+    for s = 1:S
+        if crescimento(s)
+            df(:,s) = valores_atributos(:,s)./(totais(s) + eps);
+        else
+            df(:,s) = 1./(valores_atributos(:,s) + eps);
+            df(:,s) = df(:,s) / sum(df(:,s));
+        end
+    end
+    result = mvnpdf(df, mean(df), cov(df));
+    result = result/sum(result);
+end
